@@ -1,4 +1,3 @@
-
 map = require("libs/map")
 player = require("libs/player")
 aspect = require("libs/AspectRatio")
@@ -27,32 +26,37 @@ function check_player_collision()
 	local w1 = player.w
 	local h1 = player.h
 	local y1 = player.y
-	for x = 1,8 do 
-		for y = 1,21 do 
-			if p_chunk ~= nil then 
-				local block = map.main_tiles[p_chunk][x][y] or nil 
-				if block.cancollide == true and block ~= nil then 
-					local x2 = block.x 
-					local w2 = block.width
-					local y2 = block.y 
-					local h2 = block.height
-					if x1 < x2+w2 and x2 < x1+w1 and y1 < y2+h2 and y2 < y1+h1 then 
-						colliding = true 
-						obj = block
-						break
+	for i = -1,1 do
+		for x = 1,8 do 
+			for y = 1,21 do 
+				if p_chunk ~= nil then 
+					local block = nil
+					pcall(function() block = map.main_tiles[p_chunk+i][x][y] or map.main_tiles[p_chunk][x][y] or nil end)
+					if block ~= nil and block.cancollide == true then 
+						local x2 = block.x 
+						local w2 = block.width
+						local y2 = block.y 
+						local h2 = block.height
+						if x1 < x2+w2 and x2 < x1+w1 and y1 < y2+h2 and y2 < y1+h1 then 
+							colliding = true 
+							obj = block
+							break
+						end
 					end
 				end
 			end
 		end
 	end
 		-- check if he is colliding with any objects that arent below him 
-
 		--return the check 
 	return colliding,obj
 end
 function love.load()
-	shader = moonshine(moonshine.effects.crt)
 
+	shader = moonshine(moonshine.effects.crt)
+	.chain(moonshine.effects.scanlines)
+	shader.scanlines.width = 1
+	shader.scanlines.opacity = 0.6
 	audio:load_tracks()
 	audio:play()
 	local w,h = love.graphics.getDimensions()
@@ -63,17 +67,21 @@ function love.load()
 	jump_timer = 0 
 	map.generate_chunks(20)
 	map.chunks_in_focus = {1,2,3,4} -- These are the current chunks being rendered by the GPU, when a player is introduced this will be updated in love.update 
+
 end
 
 function love.resize(w,h) -- This function refreshes the automatic scaling whenever the games window is resized. 
 	aspect:init(w,h,1920,1080)
 	shader = moonshine(moonshine.effects.crt)
+	.chain(moonshine.effects.scanlines)
+	shader.scanlines.width = 1
+	shader.scanlines.opacity = 0.6
 end
 
 function love.keypressed(key) 
 	if key:lower() == "a" or key:lower() == "d" then 
 		table.insert(keys_pressed,key:lower())
-	elseif key:lower() == "w" and jump_timer == 0 then
+	elseif key:lower() == "w" and player.falling == false and jump_timer == 0 then
 		print("Jump")
 		jumped = true 
 		jump_timer = 1 
@@ -94,13 +102,21 @@ function love.update(dt)
 	-- Render distance 
 	local p_chunk = nil 
 	for i = 1,#map.main_tiles do 
-		local range = {map.main_tiles[i].offset-50,map.main_tiles[i].offset+400}
+		local range = {map.main_tiles[i].offset-25,map.main_tiles[i].offset+400}
 		if player.x >= range[1] and player.x <= range[2] then 
 			p_chunk = i  
 		end 
 	end 
 
 	map.chunks_in_focus = {p_chunk}
+	local num = #map.main_tiles 
+	if p_chunk < num then 
+		if p_chunk > 0 then 
+			map.chunks_in_focus = {p_chunk-1,p_chunk,p_chunk+1}
+		else 
+			map.chunks_in_focus = {p_chunk,p_chunk+1}
+		end
+	end
 	--
 
 	--Velocity math for player 
