@@ -56,7 +56,8 @@ function love.load()
 	aspect:init(w,h,1920,1080) -- 1920x1080 is the games default resolution
 	keys_pressed = {} 
 	game_screen = love.graphics.newCanvas(aspect.dig_w, aspect.dig_h)
-
+	jumped = false 
+	jump_timer = 0 
 	map.generate_chunks(20)
 	map.chunks_in_focus = {1,2,3,4} -- These are the current chunks being rendered by the GPU, when a player is introduced this will be updated in love.update 
 end
@@ -68,6 +69,10 @@ end
 function love.keypressed(key) 
 	if key:lower() == "a" or key:lower() == "d" then 
 		table.insert(keys_pressed,key:lower())
+	elseif key:lower() == "w" and jump_timer == 0 then
+		print("Jump")
+		jumped = true 
+		jump_timer = 1 
 	end
 end 
 
@@ -123,7 +128,7 @@ function love.update(dt)
 	--falling physics 
 	if player.falling == true and player.grounded == false then 
 		player.y_velocity = player.y_velocity + 0.1 
-		if player.y_velocity >= player.max_velocity then player.y_velocity = player.max_velocity end 
+		if player.y_velocity >= player.max_velocity*2 then player.y_velocity = player.max_velocity*2 end 
 		player.y = player.y + player.y_velocity 
 		col,obj = check_player_collision() 
 		if col == true then 
@@ -132,6 +137,37 @@ function love.update(dt)
 			player.falling = false 
 			player.grounded = true 
 		end
+	end
+	--
+	--jumping physics 
+
+
+	if jumped == true then 
+		jumped = false 
+		jump_timer = 20
+	end 
+
+	if jump_timer == 20 then 
+		player.y_velocity = -10 
+		jump_timer = jump_timer - 1 
+	end 
+
+
+
+	if jump_timer > 0 then -- jumping physics 
+		player.y = player.y + player.y_velocity 
+		local col,ob = check_player_collision() 
+		if col == true and ob.cancollide == true then 
+			player.y = player.y - player.y_velocity
+		 	player.y_velocity = 0 
+		 	jump_timer = 0 
+		 	player.falling = true 
+		 	print("Hit top of some shit")
+		 else 
+		 	jump_timer = jump_timer - 1 
+		 	if jump_timer == 0 then player.falling = true player.grounded = false end 
+		 	print(jump_timer)
+		 end
 	end
 	--
 	--rendering results 
