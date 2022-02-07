@@ -31,7 +31,7 @@ map.main_tiles = {} -- This is the 3D array containing all of the Chunks, which 
 
 map.generate_chunks = function(amount) -- This is the current automatic chunk generation, currently making all cells air except the bottom layer, which is stone. 
 	for i = 1,amount do
-		local offset = (i-1) * 350 or 0 
+		local offset = (i-1) * 400 or 0 
 		map.main_tiles[i] = {}
 		map.main_tiles[i].offset = offset 
 		for x = 0,8 do

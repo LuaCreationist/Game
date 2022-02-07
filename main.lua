@@ -65,7 +65,7 @@ function love.load()
 	game_screen = love.graphics.newCanvas(aspect.dig_w, aspect.dig_h)
 	jumped = false 
 	jump_timer = 0 
-	map.generate_chunks(20)
+	map.generate_chunks(10)
 	map.chunks_in_focus = {1,2,3,4} -- These are the current chunks being rendered by the GPU, when a player is introduced this will be updated in love.update 
 
 end
@@ -85,6 +85,7 @@ function love.keypressed(key)
 		print("Jump")
 		jumped = true 
 		jump_timer = 1 
+	elseif key:lower() == "r" then player.x = 50 player.y = 920
 	end
 end 
 
@@ -110,11 +111,13 @@ function love.update(dt)
 
 	map.chunks_in_focus = {p_chunk}
 	local num = #map.main_tiles 
-	if p_chunk < num then 
-		if p_chunk > 0 then 
-			map.chunks_in_focus = {p_chunk-1,p_chunk,p_chunk+1}
-		else 
-			map.chunks_in_focus = {p_chunk,p_chunk+1}
+	if p_chunk ~= nil then 
+		if p_chunk < num then 
+			if p_chunk > 0 then 
+				map.chunks_in_focus = {p_chunk-1,p_chunk,p_chunk+1}
+			else 
+				map.chunks_in_focus = {p_chunk,p_chunk+1}
+			end
 		end
 	end
 	--
@@ -147,8 +150,8 @@ function love.update(dt)
 	--
 	--falling physics 
 	if player.falling == true and player.grounded == false then 
-		player.y_velocity = player.y_velocity + 0.1 
-		if player.y_velocity >= player.max_velocity*2 then player.y_velocity = player.max_velocity*2 end 
+		player.y_velocity = player.y_velocity + 0.4
+		if player.y_velocity >= player.max_velocity*4 then player.y_velocity = player.max_velocity*4 end 
 		player.y = player.y + player.y_velocity 
 		col,obj = check_player_collision() 
 		if col == true then 
@@ -158,6 +161,17 @@ function love.update(dt)
 			player.grounded = true 
 		end
 	end
+	if player.falling == false and player.grounded == true then 
+		player.y = player.y + 1 
+		col,obj = check_player_collision() 
+		if col ~= true then 
+			player.falling = true 
+			player.grounded = false 
+		else 
+			player.y = player.y - 1 
+		end
+	end
+
 	--
 	--jumping physics 
 
