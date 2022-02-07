@@ -150,8 +150,8 @@ function love.update(dt)
 	--
 	--falling physics 
 	if player.falling == true and player.grounded == false then 
-		player.y_velocity = player.y_velocity + 0.4
-		if player.y_velocity >= player.max_velocity*4 then player.y_velocity = player.max_velocity*4 end 
+		player.y_velocity = player.y_velocity + 0.3
+		if player.y_velocity >= player.max_velocity*3 then player.y_velocity = player.max_velocity*3 end 
 		player.y = player.y + player.y_velocity 
 		col,obj = check_player_collision() 
 		if col == true then 
