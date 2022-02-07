@@ -1,6 +1,6 @@
 -- 1 / Ticks Per Second
 local TICK_RATE = 1 / 60
-local FPS_RATE = 1/144
+local FPS_RATE = 1 / 180
 local Math = require("math")
 Math.randomseed(os.time())
 local MAX_FRAME_SKIP = 3

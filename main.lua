@@ -3,6 +3,7 @@ map = require("libs/map")
 player = require("libs/player")
 aspect = require("libs/AspectRatio")
 audio = require("libs/audioplayer")
+moonshine = require("moonshine")
 function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2) -- check collisions function 
   return x1 < x2+w2 and
          x2 < x1+w1 and
@@ -16,7 +17,7 @@ function check_player_collision()
 	local obj = nil
 	local p_chunk = nil 
 	for i = 1,#map.main_tiles do 
-		local range = {map.main_tiles[i].offset,map.main_tiles[i].offset+349}
+		local range = {map.main_tiles[i].offset-50,map.main_tiles[i].offset+400}
 		if player.x >= range[1] and player.x <= range[2] then 
 			p_chunk = i  
 		end 
@@ -50,6 +51,8 @@ function check_player_collision()
 	return colliding,obj
 end
 function love.load()
+	shader = moonshine(moonshine.effects.crt)
+
 	audio:load_tracks()
 	audio:play()
 	local w,h = love.graphics.getDimensions()
@@ -64,6 +67,7 @@ end
 
 function love.resize(w,h) -- This function refreshes the automatic scaling whenever the games window is resized. 
 	aspect:init(w,h,1920,1080)
+	shader = moonshine(moonshine.effects.crt)
 end
 
 function love.keypressed(key) 
@@ -90,7 +94,7 @@ function love.update(dt)
 	-- Render distance 
 	local p_chunk = nil 
 	for i = 1,#map.main_tiles do 
-		local range = {map.main_tiles[i].offset,map.main_tiles[i].offset+349}
+		local range = {map.main_tiles[i].offset-50,map.main_tiles[i].offset+400}
 		if player.x >= range[1] and player.x <= range[2] then 
 			p_chunk = i  
 		end 
@@ -141,7 +145,6 @@ function love.update(dt)
 	--
 	--jumping physics 
 
-
 	if jumped == true then 
 		jumped = false 
 		jump_timer = 20
@@ -152,8 +155,6 @@ function love.update(dt)
 		jump_timer = jump_timer - 1 
 	end 
 
-
-
 	if jump_timer > 0 then -- jumping physics 
 		player.y = player.y + player.y_velocity 
 		local col,ob = check_player_collision() 
@@ -162,11 +163,9 @@ function love.update(dt)
 		 	player.y_velocity = 0 
 		 	jump_timer = 0 
 		 	player.falling = true 
-		 	print("Hit top of some shit")
 		 else 
 		 	jump_timer = jump_timer - 1 
 		 	if jump_timer == 0 then player.falling = true player.grounded = false end 
-		 	print(jump_timer)
 		 end
 	end
 	--
@@ -183,8 +182,9 @@ end
 function love.draw()
 	love.graphics.clear(0,0,0)
 	love.graphics.setColor(1,1,1)
-	love.graphics.draw(game_screen,aspect.x,aspect.y,0,aspect.scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
+	shader(function()
+		love.graphics.draw(game_screen,aspect.x,aspect.y,0,aspect.scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
+	end)
 	love.graphics.setColor(1,1,1)
 	love.graphics.print(string.sub(tostring(love.timer.getFPS()),0,3),10,10)
-
 end
