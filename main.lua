@@ -52,7 +52,8 @@ function check_player_collision()
 	return colliding,obj
 end
 function love.load()
-
+	scale = 1 -- game draw scale 
+	yoff = 0 -- y draw offset 
 	shader = moonshine(moonshine.effects.crt)
 	.chain(moonshine.effects.scanlines)
 	shader.scanlines.width = 1
@@ -86,6 +87,9 @@ function love.keypressed(key)
 		jumped = true 
 		jump_timer = 1 
 	elseif key:lower() == "r" then player.x = 50 player.y = 920
+
+	elseif key:lower() == "x" then 
+		if scale == 1 then scale = 1.6 yoff = -500 else scale = 1 yoff = 0 end 
 	end
 end 
 
@@ -213,7 +217,7 @@ function love.draw()
 	love.graphics.clear(0,0,0)
 	love.graphics.setColor(1,1,1)
 	shader(function()
-		love.graphics.draw(game_screen,aspect.x,aspect.y,0,aspect.scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
+		love.graphics.draw(game_screen,aspect.x-( (player.x - 200)*aspect.scale),aspect.y+yoff,0,aspect.scale*scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
 	end)
 	love.graphics.setColor(1,1,1)
 	love.graphics.print(string.sub(tostring(love.timer.getFPS()),0,3),10,10)
