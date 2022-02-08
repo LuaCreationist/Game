@@ -89,7 +89,7 @@ function love.keypressed(key)
 	elseif key:lower() == "r" then player.x = 50 player.y = 920
 
 	elseif key:lower() == "x" then 
-		if scale == 1 then scale = 1.6 yoff = -500 else scale = 1 yoff = 0 end 
+		if scale == 1 then scale = 1.6 yoff = -600 else scale = 1 yoff = 0 end 
 	end
 end 
 
