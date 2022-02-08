@@ -9,8 +9,6 @@ Each tile is 50x50 and contained within chunks of 8x21.
 
 The client will scale what it is rendering to whatever resolution you put it to, but this will soon be changed to what resolution setting you choose. 
 
-A camera feature will soon be implemented to follow the player, and be toggleable to the current perspective and a closer one. 
-
 Currently the game will attempt to render the chunk the player is in, infront of, and behind. It handles all exceptions when it cannot. 
 
 All of the players movement is based upon velocity, including the jumping, no collision problems have been found so far. 
@@ -19,3 +17,9 @@ The music player simply loops an audio track.
 
 And the map generation is currently able to handle random generation, though soon I want it to be able to handle built in map files that potentially could be generated from 
 another project. 
+
+Alpha 1.1 - Camera Added. Hit X to Zoom in on the player 
+Additional patches : 
+
+Edge of display is now offset by the players position. 
+Shaders Reintroduced and minimalized. 
