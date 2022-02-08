@@ -204,6 +204,7 @@ function love.update(dt)
 	end
 	--
 	--rendering results 
+	love.graphics.translate((player.x*-1) + 100,0)
 	game_screen:renderTo(function()
 		love.graphics.clear(0.18,0.08,0.2)
 		love.graphics.setColor(1,1,1)
@@ -217,7 +218,7 @@ function love.draw()
 	love.graphics.clear(0,0,0)
 	love.graphics.setColor(1,1,1)
 	shader(function()
-		love.graphics.draw(game_screen,aspect.x-( (player.x - 200)*aspect.scale),aspect.y+yoff,0,aspect.scale*scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
+		love.graphics.draw(game_screen,aspect.x,aspect.y+yoff,0,aspect.scale*scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
 	end)
 	love.graphics.setColor(1,1,1)
 	love.graphics.print(string.sub(tostring(love.timer.getFPS()),0,3),10,10)
