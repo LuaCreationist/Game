@@ -134,7 +134,6 @@ function love.update(dt)
 		end
 	end
 	--
-
 	--Velocity math for player 
 	local pressing_d = false
 	local pressing_a = false 
@@ -156,7 +155,6 @@ function love.update(dt)
 		if player.velocity > 0 then player.velocity = 0 end 
 	end 
 	--
-
 	--Deciding if player moves 
 	player.x = player.x + player.velocity 
 	local col,obj = check_player_collision()
@@ -179,6 +177,7 @@ function love.update(dt)
 			player.grounded = true 
 		end
 	end
+
 	if player.falling == false and player.grounded == true then 
 		player.y = player.y + 1 
 		col,obj = check_player_collision() 
@@ -189,7 +188,6 @@ function love.update(dt)
 			player.y = player.y - 1 
 		end
 	end
-
 	--
 	--jumping physics 
 

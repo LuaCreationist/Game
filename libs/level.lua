@@ -26,7 +26,6 @@ local level = { -- i value -- X any y are flipped, the Right side is the ground,
 	 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 	 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 	},-- x value 	
-	
 
 }
 
