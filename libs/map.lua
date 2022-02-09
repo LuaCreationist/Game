@@ -1,5 +1,6 @@
 local map = {}
 map.chunks_in_focus = {} -- the chunks being rendered by the GPU 
+map.main_tiles = {} -- This is the 3D array containing all of the Chunks, which themselves are 2D arrays. Each cell is a chunk.
 
 map.make_entity = function(type) -- This function creates entitys (Any item contained in a chunk) and returns them, used in chunk generation. 
 	local ent = {}
@@ -27,7 +28,28 @@ map.make_entity = function(type) -- This function creates entitys (Any item cont
 	return ent
 end
 
-map.main_tiles = {} -- This is the 3D array containing all of the Chunks, which themselves are 2D arrays. Each cell is a chunk.
+map.convert_to_chunk = function(t) -- converts 3D array into useable game chunk with the make_entity command 
+	for i = 1,#t do 
+		local offset = (i-1) * 400 or 0 
+		t[i].offset = offset
+		for x = 1,8 do 
+			for y = 1,21 do 
+				local cell = nil or t[i][x][y] 
+				if cell ~= nil then 
+					if cell == 0 then
+						cell = map.make_entity("air")
+					elseif cell == 1 then 
+						cell = map.make_entity("stone")
+					end
+				end
+				t[i][x][y] = cell 
+				t[i][x][y].x = (x-1) * 50 + offset 
+				t[i][x][y].y = 50 * (y-1) 
+			end
+		end
+	end 
+	return t 
+end
 
 map.generate_chunks = function(amount) -- This is the current automatic chunk generation, currently making all cells air except the bottom layer, which is stone. 
 	for i = 1,amount do

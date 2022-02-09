@@ -3,6 +3,7 @@ player = require("libs/player")
 aspect = require("libs/AspectRatio")
 audio = require("libs/audioplayer")
 moonshine = require("moonshine")
+level = require("libs/level")
 function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2) -- check collisions function 
   return x1 < x2+w2 and
          x2 < x1+w1 and
@@ -66,8 +67,9 @@ function love.load()
 	game_screen = love.graphics.newCanvas(aspect.dig_w, aspect.dig_h)
 	jumped = false 
 	jump_timer = 0 
-	map.generate_chunks(10)
-	map.chunks_in_focus = {1,2,3,4} -- These are the current chunks being rendered by the GPU, when a player is introduced this will be updated in love.update 
+	level = map.convert_to_chunk(level)
+	map.main_tiles = level
+	map.chunks_in_focus = {1} -- These are the current chunks being rendered by the GPU, when a player is introduced this will be updated in love.update 
 
 end
 
@@ -77,6 +79,7 @@ function love.resize(w,h) -- This function refreshes the automatic scaling whene
 	.chain(moonshine.effects.scanlines)
 	shader.scanlines.width = 1
 	shader.scanlines.opacity = 0.6
+	yoff = love.graphics.getHeight() - (love.graphics.getHeight() * scale)
 end
 
 function love.keypressed(key) 
@@ -89,7 +92,13 @@ function love.keypressed(key)
 	elseif key:lower() == "r" then player.x = 50 player.y = 920
 
 	elseif key:lower() == "x" then 
-		if scale == 1 then scale = 1.6 yoff = -600 else scale = 1 yoff = 0 end 
+		if scale == 1 then
+			scale = 1.6
+			yoff = love.graphics.getHeight() - (love.graphics.getHeight() * scale)
+		else 
+			scale = 1 
+			yoff = 0 
+		end 
 	end
 end 
 
@@ -149,8 +158,13 @@ function love.update(dt)
 	--
 
 	--Deciding if player moves 
+	player.x = player.x + player.velocity 
 	local col,obj = check_player_collision()
-	if col ~= true then player:move() end 
+	if col ~= true then
+	else
+		player.x = player.x - player.velocity 
+		player.velocity = 0
+	end 
 	--
 	--falling physics 
 	if player.falling == true and player.grounded == false then 
