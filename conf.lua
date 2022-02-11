@@ -63,18 +63,18 @@ function love.conf(t)
 
     t.audio.mixwithsystem = true        -- Keep background music playing when opening LOVE (boolean, iOS and Android only)
 
-    t.window.title = "Idle"
+    t.window.title = "My Game"
     t.window.icon = nil
     t.window.width = 1280
     t.window.height = 720
     t.window.borderless = false
-    t.window.resizable = true
+    t.window.resizable = false
     t.window.minwidth = 250
     t.window.minheight = 250
     t.window.fullscreen = false
     t.window.fullscreentype = "desktop"
     t.window.vsync = 0
-    t.window.msaa = 2
+    t.window.msaa = 0
     t.window.display = 1
     t.window.highdpi = false
     t.window.x = nil

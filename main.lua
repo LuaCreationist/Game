@@ -55,7 +55,6 @@ function love.load()
 	audio = require("libs/audioplayer")
 	moonshine = require("moonshine")
 	level = require("libs/level")
-	sky = love.graphics.newImage("sprites/FullMoon.png")
 	p_chunk = nil 
 	garbage_man = require("libs/garbagehelper")
 	big_font = love.graphics.newFont(32)
@@ -146,19 +145,19 @@ function game_update(dt) -- main game simulation
 	local pressing_a = false 
 	for i,v in pairs(keys_pressed) do 
 		if v == "a" then 
-			player:add_velocity(-0.1)
+			player:add_velocity(-0.16)
 			pressing_a = true 
 		elseif v == "d" then 
-			player:add_velocity(0.1)
+			player:add_velocity(0.16)
 			pressing_d = true 
 		end
 	end
 	if player.velocity > 0 and pressing_d == false then 
-		player.velocity = player.velocity - 0.1 
+		player.velocity = player.velocity - 0.16
 		if player.velocity < 0 then player.velocity = 0 end 
 	end 
 	if player.velocity < 0 and pressing_a == false then 
-		player.velocity = player.velocity + 0.1 
+		player.velocity = player.velocity + 0.16 
 		if player.velocity > 0 then player.velocity = 0 end 
 	end 
 	--

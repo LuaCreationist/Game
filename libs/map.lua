@@ -34,6 +34,16 @@ map.make_entity = function(type) -- This function creates entitys (Any item cont
 		ent.r = 0.24
 		ent.g = 0.42
 		ent.b = 0.2
+	elseif type == "water" then 
+		ent.x = nil
+		ent.y = nil
+		ent.width = 50
+		ent.height = 50
+		ent.cancollide = false
+		ent.transparency = 0
+		ent.r = 0.1
+		ent.g = 0.22
+		ent.b = 0.8
 	end
 	return ent
 end
@@ -52,6 +62,8 @@ map.convert_to_chunk = function(t) -- converts 3D array into useable game chunk 
 						cell = map.make_entity("stone")
 					elseif cell == 2 then 
 						cell = map.make_entity("grass")
+					elseif cell == 3 then 
+						cell = map.make_entity("water")
 					end
 				end
 				t[i][x][y] = cell 
