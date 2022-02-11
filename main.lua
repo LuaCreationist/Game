@@ -1,10 +1,5 @@
-map = require("libs/map")
-player = require("libs/player")
-aspect = require("libs/AspectRatio")
-audio = require("libs/audioplayer")
-moonshine = require("moonshine")
-level = require("libs/level")
-function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2) -- check collisions function 
+
+local function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2) -- check collisions function 
   return x1 < x2+w2 and
          x2 < x1+w1 and
          y1 < y2+h2 and
@@ -53,6 +48,19 @@ function check_player_collision()
 	return colliding,obj
 end
 function love.load()
+	load_time = love.timer.getTime()
+	map = require("libs/map")
+	player = require("libs/player")
+	aspect = require("libs/AspectRatio")
+	audio = require("libs/audioplayer")
+	moonshine = require("moonshine")
+	level = require("libs/level")
+	sky = love.graphics.newImage("sprites/FullMoon.png")
+	p_chunk = nil 
+	garbage_man = require("libs/garbagehelper")
+	big_font = love.graphics.newFont(32)
+	small_font = love.graphics.newFont(18)
+	paused_width = big_font:getWidth("PAUSED")/2
 	scale = 1 -- game draw scale 
 	yoff = 0 -- y draw offset 
 	shader = moonshine(moonshine.effects.crt)
@@ -70,7 +78,10 @@ function love.load()
 	level = map.convert_to_chunk(level)
 	map.main_tiles = level
 	map.chunks_in_focus = {1} -- These are the current chunks being rendered by the GPU, when a player is introduced this will be updated in love.update 
-
+	paused = false
+	love.graphics.setLineWidth(4)
+	load_time = love.timer.getTime() - load_time
+	print(load_time)
 end
 
 function love.resize(w,h) -- This function refreshes the automatic scaling whenever the games window is resized. 
@@ -85,8 +96,7 @@ end
 function love.keypressed(key) 
 	if key:lower() == "a" or key:lower() == "d" then 
 		table.insert(keys_pressed,key:lower())
-	elseif key:lower() == "w" and player.falling == false and jump_timer == 0 then
-		print("Jump")
+	elseif key:lower() == "w" and player.falling == false and jump_timer == 0 and paused == false then
 		jumped = true 
 		jump_timer = 1 
 	elseif key:lower() == "r" then player.x = 50 player.y = 920
@@ -99,6 +109,8 @@ function love.keypressed(key)
 			scale = 1 
 			yoff = 0 
 		end 
+	elseif key:lower() == "escape" or key:lower() == "p" then 
+		paused = not paused
 	end
 end 
 
@@ -112,26 +124,21 @@ function love.keyreleased(key)
 	end
 end
 
-function love.update(dt)
-	-- Render distance 
-	local p_chunk = nil 
+function game_update(dt) -- main game simulation 
+-- Render distance 
+	local p_changed = false 
 	for i = 1,#map.main_tiles do 
 		local range = {map.main_tiles[i].offset-25,map.main_tiles[i].offset+400}
 		if player.x >= range[1] and player.x <= range[2] then 
-			p_chunk = i  
+			if i ~= p_chunk then 
+				p_chunk = i
+				p_changed = true   
+			end
 		end 
 	end 
-
-	map.chunks_in_focus = {p_chunk}
-	local num = #map.main_tiles 
-	if p_chunk ~= nil then 
-		if p_chunk < num then 
-			if p_chunk > 0 then 
-				map.chunks_in_focus = {p_chunk-1,p_chunk,p_chunk+1}
-			else 
-				map.chunks_in_focus = {p_chunk,p_chunk+1}
-			end
-		end
+	if p_changed == true then 
+		map.chunks_in_focus = {p_chunk-2,p_chunk-1,p_chunk,p_chunk+1,p_chunk+2}
+		p_changed = false 
 	end
 	--
 	--Velocity math for player 
@@ -214,24 +221,37 @@ function love.update(dt)
 		 	if jump_timer == 0 then player.falling = true player.grounded = false end 
 		 end
 	end
-	--
+end
+
+function love.update(dt)
+	if paused == false  then
+		game_update(dt)
+	end
 	--rendering results 
 	love.graphics.translate((player.x*-1) + 100,0)
 	game_screen:renderTo(function()
-		love.graphics.clear(0.18,0.08,0.2)
+		love.graphics.clear(0.18,0.08,0.25)
 		love.graphics.setColor(1,1,1)
 		map.draw_chunks()
 		player:draw()
+		if paused == true then 
+			love.graphics.setColor(0.1,0.1,0.1,0.7)
+			love.graphics.rectangle("fill",0,0,1920,1080)
+			love.graphics.setColor(1,1,1)
+			love.graphics.setFont(big_font)
+			love.graphics.print("PAUSED",960 - paused_width,240)
+		end
 	end)
 	--
+	--garbage_man.update(dt)
 end
 
-function love.draw()
-	love.graphics.clear(0,0,0)
+function love.draw(dt)
 	love.graphics.setColor(1,1,1)
 	shader(function()
 		love.graphics.draw(game_screen,aspect.x,aspect.y+yoff,0,aspect.scale*scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
 	end)
 	love.graphics.setColor(1,1,1)
+	love.graphics.setFont(small_font)
 	love.graphics.print(string.sub(tostring(love.timer.getFPS()),0,3),10,10)
 end

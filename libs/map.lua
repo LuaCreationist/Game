@@ -24,6 +24,16 @@ map.make_entity = function(type) -- This function creates entitys (Any item cont
 		ent.r = 0.5
 		ent.g = 0.5
 		ent.b = 0.5
+	elseif type == "grass" then 
+		ent.x = nil
+		ent.y = nil
+		ent.width = 50
+		ent.height = 50
+		ent.cancollide = true
+		ent.transparency = 0
+		ent.r = 0.24
+		ent.g = 0.42
+		ent.b = 0.2
 	end
 	return ent
 end
@@ -40,6 +50,8 @@ map.convert_to_chunk = function(t) -- converts 3D array into useable game chunk 
 						cell = map.make_entity("air")
 					elseif cell == 1 then 
 						cell = map.make_entity("stone")
+					elseif cell == 2 then 
+						cell = map.make_entity("grass")
 					end
 				end
 				t[i][x][y] = cell 
@@ -78,15 +90,17 @@ end
 
 map.draw_chunks = function() -- This is the function that displays the focused chunks into the GPU
 	for v,i in pairs(map.chunks_in_focus) do
-
-		for x = 1,8 do
-			for y = 1,21 do
-				local block = map.main_tiles[i] and map.main_tiles[i][x] and map.main_tiles[i][x][y] or nil -- Making sure the block exists within the arrays 
-				if block and block.transparency ~=1 then -- Checks if the block should be visible 
-					love.graphics.setColor(block.r,block.g,block.b)
-					local bx,by,bw,bh = map.main_tiles[i][x][y].x,map.main_tiles[i][x][y].y,map.main_tiles[i][x][y].width,map.main_tiles[i][x][y].height
-					love.graphics.rectangle("line", bx,by,bw,bh)
-					love.graphics.rectangle("line", bx + 4,by + 4,bw - 8,bh - 8)	
+		if v > 0 and v < #map.main_tiles then 
+			for x = 1,8 do
+				for y = 1,21 do
+					local block = map.main_tiles[i] and map.main_tiles[i][x] and map.main_tiles[i][x][y] or nil -- Making sure the block exists within the arrays 
+					if block and block.transparency ~=1 then -- Checks if the block should be visible 
+						love.graphics.setColor(block.r,block.g,block.b)
+						local bx,by,bw,bh = map.main_tiles[i][x][y].x,map.main_tiles[i][x][y].y,map.main_tiles[i][x][y].width,map.main_tiles[i][x][y].height
+						love.graphics.rectangle("fill", bx,by,bw,bh)
+						love.graphics.setColor(0,0,0)
+						love.graphics.rectangle("line", bx,by,bw,bh)	
+					end
 				end
 			end
 		end
