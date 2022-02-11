@@ -67,7 +67,7 @@ function love.load()
 	shader.scanlines.width = 1
 	shader.scanlines.opacity = 0.6
 	audio:load_tracks()
-	audio:play()
+	audio.track_stone:play()
 	local w,h = love.graphics.getDimensions()
 	aspect:init(w,h,1920,1080) -- 1920x1080 is the games default resolution
 	keys_pressed = {} 
@@ -130,8 +130,24 @@ function game_update(dt) -- main game simulation
 		local range = {map.main_tiles[i].offset-25,map.main_tiles[i].offset+400}
 		if player.x >= range[1] and player.x <= range[2] then 
 			if i ~= p_chunk then 
+				local chunk_type = nil 
+				if p_chunk ~= nil then chunk_type = map.main_tiles[p_chunk].chunk_type end 
 				p_chunk = i
 				p_changed = true   
+				if chunk_type ~= nil then 
+					if chunk_type ~= map.main_tiles[p_chunk].chunk_type then 
+						chunk_type = map.main_tiles[p_chunk].chunk_type
+						if chunk_type == "woods" then 
+							audio.track_woods:seek(audio.track_stone:tell())
+							audio.track_stone:pause()
+							audio.track_woods:play() 
+						elseif chunk_type == "stone" then 
+							audio.track_stone:seek(audio.track_woods:tell())
+							audio.track_woods:pause()
+							audio.track_stone:play() 
+						end 
+					end
+				end
 			end
 		end 
 	end 
@@ -233,13 +249,6 @@ function love.update(dt)
 		love.graphics.setColor(1,1,1)
 		map.draw_chunks()
 		player:draw()
-		if paused == true then 
-			love.graphics.setColor(0.1,0.1,0.1,0.7)
-			love.graphics.rectangle("fill",0,0,1920,1080)
-			love.graphics.setColor(1,1,1)
-			love.graphics.setFont(big_font)
-			love.graphics.print("PAUSED",960 - paused_width,240)
-		end
 	end)
 	--
 	--garbage_man.update(dt)
@@ -249,6 +258,13 @@ function love.draw(dt)
 	love.graphics.setColor(1,1,1)
 	shader(function()
 		love.graphics.draw(game_screen,aspect.x,aspect.y+yoff,0,aspect.scale*scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
+		if paused == true then 
+			love.graphics.setColor(0.1,0.1,0.1,0.7)
+			love.graphics.rectangle("fill",0,0,love.graphics.getDimensions())
+			love.graphics.setColor(1,1,1)
+			love.graphics.setFont(big_font)
+			love.graphics.print("PAUSED",(love.graphics.getWidth()/2)-paused_width,240)
+		end
 	end)
 	love.graphics.setColor(1,1,1)
 	love.graphics.setFont(small_font)
