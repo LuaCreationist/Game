@@ -56,7 +56,6 @@ function love.load()
 	moonshine = require("moonshine")
 	level = require("libs/level")
 	p_chunk = nil 
-	garbage_man = require("libs/garbagehelper")
 	big_font = love.graphics.newFont(32)
 	small_font = love.graphics.newFont(18)
 	paused_width = big_font:getWidth("PAUSED")/2
@@ -67,7 +66,6 @@ function love.load()
 	shader.scanlines.width = 1
 	shader.scanlines.opacity = 0.6
 	audio:load_tracks()
-	audio.track_stone:play()
 	local w,h = love.graphics.getDimensions()
 	aspect:init(w,h,1920,1080) -- 1920x1080 is the games default resolution
 	keys_pressed = {} 
@@ -138,13 +136,9 @@ function game_update(dt) -- main game simulation
 					if chunk_type ~= map.main_tiles[p_chunk].chunk_type then 
 						chunk_type = map.main_tiles[p_chunk].chunk_type
 						if chunk_type == "woods" then 
-							audio.track_woods:seek(audio.track_stone:tell())
-							audio.track_stone:pause()
-							audio.track_woods:play() 
+							audio:fade_to(audio.track_woods)
 						elseif chunk_type == "stone" then 
-							audio.track_stone:seek(audio.track_woods:tell())
-							audio.track_woods:pause()
-							audio.track_stone:play() 
+							audio:fade_to(audio.track_stone)
 						end 
 					end
 				end
@@ -155,6 +149,7 @@ function game_update(dt) -- main game simulation
 		map.chunks_in_focus = {p_chunk-2,p_chunk-1,p_chunk,p_chunk+1,p_chunk+2}
 		p_changed = false 
 	end
+	audio:update(dt)
 	--
 	--Velocity math for player 
 	local pressing_d = false
@@ -251,7 +246,6 @@ function love.update(dt)
 		player:draw()
 	end)
 	--
-	--garbage_man.update(dt)
 end
 
 function love.draw(dt)
@@ -268,5 +262,6 @@ function love.draw(dt)
 	end)
 	love.graphics.setColor(1,1,1)
 	love.graphics.setFont(small_font)
+	love.graphics.print(string.sub('MB' .. collectgarbage('count')/1024,0,5), 10,30)
 	love.graphics.print(string.sub(tostring(love.timer.getFPS()),0,3),10,10)
 end
