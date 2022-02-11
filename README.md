@@ -1,25 +1,19 @@
 # Right now its kinda just a thing.
 
-There's a good amount going on under the hood, so I'll start documenting that bit by bit I suppose. 
-
-The background is always a static color, and the shaders are provided by moonshine. 
-
-The game client is native 1920x1080, and as you'll notice most objects aside from the player are tiles. 
-Each tile is 50x50 and contained within chunks of 8x21. 
-
-The client will scale what it is rendering to whatever resolution you put it to, but this will soon be changed to what resolution setting you choose. 
-
-Currently the game will attempt to render the chunk the player is in, infront of, and behind. It handles all exceptions when it cannot. 
-
-All of the players movement is based upon velocity, including the jumping, no collision problems have been found so far. 
-
-The music player simply loops an audio track. 
-
-And the map generation is currently able to handle random generation, though soon I want it to be able to handle built in map files that potentially could be generated from 
-another project. 
+You're a little pill guy traveling about. Nothing to do quite yet. Prolly, maybe, might be soon. 
 
 Alpha 1.1 - Camera Added. Hit X to Zoom in on the player 
 Additional patches : 
-
-Edge of display is now offset by the players position. 
-Shaders Reintroduced and minimalized. 
+ Alpha 1.2-1.12 : 
+- Player velocity stick on wall collision has been fixed 
+- Map generation has been replaced with premade maps in a separate Lua file, making the size absolutely tiny. 
+- These maps have chunks with differentiating chunk types, which may have effects on visuals later in the game. 
+- When a player changes their chunk type, the current music track will be switched to the appropriate one 
+- All music in the game (Made by Copyright Jeffery Wellman 2022) have the same background track, and loop perfectly
+- so when you change biomes, the music changes with it. Soon they will fade out instead of abruptly changing if neccessary. 
+- Player render distance increased to 6. 
+- Render order has been altered and the render process has been adjusted to reduce translation tear, though it cannot be entirely avoided without the use of VSync as of yet. 
+- Player velocity curve adjusted for smoothening.
+- Water tile / Grass tile have been added 
+- Woods chunk type has been added, default chunk type renamed to Stone 
+- Game load time average clocked in at 70 microseconds. 
