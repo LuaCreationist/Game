@@ -245,6 +245,7 @@ function love.update(dt)
 		map.draw_chunks()
 		player:draw()
 	end)
+	love.graphics.origin()
 	--
 end
 
