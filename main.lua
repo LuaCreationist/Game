@@ -48,6 +48,7 @@ function check_player_collision()
 	return colliding,obj
 end
 function love.load()
+	monitor = require("libs/resources")
 	load_time = love.timer.getTime()
 	map = require("libs/map")
 	player = require("libs/player")
@@ -247,10 +248,12 @@ function love.update(dt)
 	end)
 	love.graphics.origin()
 	--
+	monitor.update(dt)
 end
 
 function love.draw(dt)
 	love.graphics.setColor(1,1,1)
+	
 	shader(function()
 		love.graphics.draw(game_screen,aspect.x,aspect.y+yoff,0,aspect.scale*scale) -- the 120 offset on the Y axis is so the floor level is more appropriate for the viewer, as a player is introduced this will likely change. 
 		if paused == true then 
@@ -263,6 +266,6 @@ function love.draw(dt)
 	end)
 	love.graphics.setColor(1,1,1)
 	love.graphics.setFont(small_font)
-	love.graphics.print(string.sub('MB' .. collectgarbage('count')/1024,0,5), 10,30)
-	love.graphics.print(string.sub(tostring(love.timer.getFPS()),0,3),10,10)
+	monitor.draw()
+	
 end
